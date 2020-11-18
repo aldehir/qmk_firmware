@@ -109,17 +109,38 @@ Where `X_Y` is the location of the LED in the matrix defined by [the datasheet](
 
 ### WS2812 :id=ws2812
 
-There is basic support for addressable RGB matrix lighting with a WS2811/WS2812{a,b,c} addressable LED strand. To enable it, add this to your `rules.mk`:
+There is basic support for addressable RGB matrix lighting with a WS2811/WS2812{a,b,c}  LED strand. To enable it, add this to your `rules.mk`:
 
 ```makefile
 RGB_MATRIX_ENABLE = WS2812
 ```
+
 
 Configure the hardware via your `config.h`:
 
 ```c
 // The pin connected to the data pin of the LEDs
 #define RGB_DI_PIN D7
+// The number of LEDs connected
+#define DRIVER_LED_TOTAL 70
+```
+
+---
+
+### APA102 :id=apa102
+
+There is similarly basic support for APA102 based addressable LED strings. To enable it, add this to your `rules.mk`
+
+```makefile
+RGB_MATRIX_ENABLE = APA102
+```
+
+And configure the LED count and connections this to your `config.h`
+```c
+// The pin connected to the data pin of the LEDs
+#define RGB_DI_PIN D7
+// The pin connected to the clock pin of the LEDs
+#define RGB_CI_PIN D6
 // The number of LEDs connected
 #define DRIVER_LED_TOTAL 70
 ```

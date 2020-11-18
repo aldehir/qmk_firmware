@@ -110,8 +110,8 @@ void static apa102_end_frame(uint16_t num_leds) {
 #define APA102_SEND_BIT(byte, bit)               \
     do {                                         \
         writePin(RGB_DI_PIN, (byte >> bit) & 1); \
-        writePinHigh(RGB_CI_PIN);                \
-        writePinLow(RGB_CI_PIN);                 \
+        writePinHigh(RGB_CI_PIN);               \
+        writePinLow(RGB_CI_PIN);                \
     } while (0)
 
 void static apa102_send_byte(uint8_t byte) {

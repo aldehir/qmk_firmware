@@ -148,17 +148,27 @@ else
   endif
 endif
 
-ifeq ($(strip $(RGBLIGHT_ENABLE)), yes)
-    POST_CONFIG_H += $(QUANTUM_DIR)/rgblight_post_config.h
-    OPT_DEFS += -DRGBLIGHT_ENABLE
-    SRC += $(QUANTUM_DIR)/color.c
-    SRC += $(QUANTUM_DIR)/rgblight.c
-    CIE1931_CURVE := yes
-    RGB_KEYCODES_ENABLE := yes
-    ifeq ($(strip $(RGBLIGHT_CUSTOM_DRIVER)), yes)
-        OPT_DEFS += -DRGBLIGHT_CUSTOM_DRIVER
+VALID_RGB_TYPES := yes WS2812 APA102 custom
+
+RGBLIGHT_ENABLE ?= no
+ifneq ($(strip $(RGBLIGHT_ENABLE)), no)
+    ifeq ($(filter $(RGBLIGHT_ENABLE),$(VALID_RGB_TYPES)),)
+        $(error RGBLIGHT_ENABLE="$(RGBLIGHT_ENABLE)" is not a valid RGB type)
     else
-        WS2812_DRIVER_REQUIRED := yes
+        POST_CONFIG_H += $(QUANTUM_DIR)/rgblight_post_config.h
+        OPT_DEFS += -DRGBLIGHT_ENABLE
+        SRC += $(QUANTUM_DIR)/color.c
+        SRC += $(QUANTUM_DIR)/rgblight.c
+        CIE1931_CURVE := yes
+        RGB_KEYCODES_ENABLE := yes
+
+        ifeq ($(strip $(RGBLIGHT_CUSTOM_DRIVER)), yes)
+            OPT_DEFS += -DRGBLIGHT_CUSTOM_DRIVER
+        else ifeq ($(strip $(RGBLIGHT_ENABLE)), APA102)
+            APA102_DRIVER_REQUIRED := yes
+        else
+            WS2812_DRIVER_REQUIRED := yes
+        endif
     endif
 endif
 
@@ -237,6 +247,11 @@ endif
 ifeq ($(strip $(RGB_MATRIX_ENABLE)), WS2812)
     OPT_DEFS += -DWS2812
     WS2812_DRIVER_REQUIRED := yes
+endif
+
+ifeq ($(strip $(RGB_MATRIX_ENABLE)), APA102)
+    OPT_DEFS += -DAPA102
+    APA102_DRIVER_REQUIRED := yes
 endif
 
 ifeq ($(strip $(RGB_MATRIX_CUSTOM_KB)), yes)
@@ -339,6 +354,18 @@ ifeq ($(strip $(WS2812_DRIVER_REQUIRED)), yes)
         QUANTUM_LIB_SRC += i2c_master.c
     endif
 endif
+
+VALID_APA102_DRIVER_TYPES := bitbang
+
+APA102_DRIVER ?= bitbang
+ifeq ($(strip $(APA102_DRIVER_REQUIRED)), yes)
+    ifeq ($(filter $(APA102_DRIVER),$(VALID_APA102_DRIVER_TYPES)),)
+        $(error APA102_DRIVER="$(APA102_DRIVER)" is not a valid APA102 driver)
+    endif
+
+    SRC += apa102.c
+endif
+
 
 ifeq ($(strip $(VISUALIZER_ENABLE)), yes)
     CIE1931_CURVE := yes

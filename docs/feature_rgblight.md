@@ -10,22 +10,30 @@ Currently QMK supports the following addressable LEDs (however, the white LED in
 
  * WS2811, WS2812, WS2812B, WS2812C, etc.
  * SK6812, SK6812MINI, SK6805
+ * APA102
 
 These LEDs are called "addressable" because instead of using a wire per color, each LED contains a small microchip that understands a special protocol sent over a single wire. The chip passes on the remaining data to the next LED, allowing them to be chained together. In this way, you can easily control the color of the individual LEDs.
 
 ## Usage
 
-On keyboards with onboard RGB LEDs, it is usually enabled by default. If it is not working for you, check that your `rules.mk` includes the following:
+On keyboards with onboard RGB LEDs, it is usually enabled by default. If it is not working for you, check that your `rules.mk` has the correct type of LED set:
 
-```make
-RGBLIGHT_ENABLE = yes
+```makefile
+RGBLIGHT_ENABLE = WS2812
+```
+?> You may see `yes` being used in place of `WS2812`, and this is okay. However, `yes` is deprecated, and ideally `WS2812` should be used instead.
+
+If your board uses APA102 LEDs (very rare) then you can use
+```makefile
+RGBLIGHT_ENABLE = APA102
 ```
 
-At minimum you must define the data pin your LED strip is connected to, and the number of LEDs in the strip, in your `config.h`. If your keyboard has onboard RGB LEDs, and you are simply creating a keymap, you usually won't need to modify these.
+At minimum you must define the number of LEDs in the strip, the data pin your LED strip is connected to, and if you're using APA102s the clock pin, in your `config.h`. If your keyboard has onboard RGB LEDs, and you are simply creating a keymap, you usually won't need to modify these.
 
 |Define         |Description                                                                                              |
 |---------------|---------------------------------------------------------------------------------------------------------|
 |`RGB_DI_PIN`   |The pin connected to the data pin of the LEDs                                                            |
+|`RGB_CI_PIN`   |The pin connected to the clock pin of the LEDs (only relevant for APA102)                                |
 |`RGBLED_NUM`   |The number of LEDs connected                                                                             |
 |`RGBLED_SPLIT` |(Optional) For split keyboards, the number of LEDs connected on each half directly wired to `RGB_DI_PIN` |
 
