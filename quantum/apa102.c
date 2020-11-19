@@ -68,10 +68,10 @@ void static apa102_send_frame(uint8_t red, uint8_t green, uint8_t blue, uint8_t 
 
 void static apa102_start_frame(void) {
     apa102_init();
-    apa102_send_byte(0);
-    apa102_send_byte(0);
-    apa102_send_byte(0);
-    apa102_send_byte(0);
+    for(uint8_t i=0; i<4; i++)
+    {
+        apa102_send_byte(0);
+    }
 }
 
 void static apa102_end_frame(uint16_t num_leds) {
@@ -110,17 +110,13 @@ void static apa102_end_frame(uint16_t num_leds) {
 #define APA102_SEND_BIT(byte, bit)               \
     do {                                         \
         writePin(RGB_DI_PIN, (byte >> bit) & 1); \
-        writePinHigh(RGB_CI_PIN);               \
-        writePinLow(RGB_CI_PIN);                \
+        writePinHigh(RGB_CI_PIN);                \
+        writePinLow(RGB_CI_PIN);                 \
     } while (0)
 
 void static apa102_send_byte(uint8_t byte) {
-    APA102_SEND_BIT(byte, 7);
-    APA102_SEND_BIT(byte, 6);
-    APA102_SEND_BIT(byte, 5);
-    APA102_SEND_BIT(byte, 4);
-    APA102_SEND_BIT(byte, 3);
-    APA102_SEND_BIT(byte, 2);
-    APA102_SEND_BIT(byte, 1);
-    APA102_SEND_BIT(byte, 0);
+    for (uint8_t i=7; i<=7; i--)
+    {
+        APA102_SEND_BIT(byte, i);
+    }
 }

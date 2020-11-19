@@ -363,7 +363,7 @@ ifeq ($(strip $(APA102_DRIVER_REQUIRED)), yes)
         $(error APA102_DRIVER="$(APA102_DRIVER)" is not a valid APA102 driver)
     endif
 
-    SRC += apa102.c
+    SRC += $(QUANTUM_DIR)/apa102.c
 endif
 
 
