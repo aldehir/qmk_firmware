@@ -23,6 +23,36 @@
 #include "apa102.h"
 #include "quantum.h"
 
+#ifndef APA102_NOPS
+#    if defined(__AVR__)
+// AVR at 16 MHz already spends 62.5 ns per clock, so no extra delay is needed
+#        define APA102_NOPS 0
+#    elif defined(PROTOCOL_CHIBIOS)
+// This code is adjusted from the ws2812 driver
+#        include "hal.h"
+
+#        if defined(STM32F0XX) || defined(STM32F1XX) || defined(STM32F3XX) || defined(STM32F4XX) || defined(STM32L0XX)
+             // This calculates how many loops of 4 nops to run to delay 100 ns
+#            define APA102_NOPS (100 / (1000000000L / (STM32_SYSCLK / 4)))
+#        else
+#            error("APA102_NOPS configuration required")
+             // this just pleases the compile so the above error is easier to spot
+#            define APA102_NOPS 0
+#        endif
+#    endif
+
+#    endif
+
+#define io_wait                                 \
+    do {                                        \
+        for (int i = 0; i < APA102_NOPS; i++) { \
+            __asm__ volatile("nop\n\t"          \
+                             "nop\n\t"          \
+                             "nop\n\t"          \
+                             "nop\n\t");        \
+        }                                       \
+    } while (0)
+
 uint8_t apa102_led_brightness = APA102_DEFAULT_BRIGHTNESS;
 
 void static apa102_start_frame(void);
@@ -110,11 +140,11 @@ void static apa102_end_frame(uint16_t num_leds) {
 #define APA102_SEND_BIT(byte, bit)               \
     do {                                         \
         writePin(RGB_DI_PIN, (byte >> bit) & 1); \
-        wait_us(0.1);                            \
+        io_wait;                                 \
         writePinHigh(RGB_CI_PIN);                \
-        wait_us(0.1);                            \
+        io_wait;                                 \
         writePinLow(RGB_CI_PIN);                 \
-        wait_us(0.1);                            \
+        io_wait;                                 \
     } while (0)
 
 void static apa102_send_byte(uint8_t byte) {
